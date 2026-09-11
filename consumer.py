@@ -2,8 +2,64 @@ from confluent_kafka import DeserializingConsumer
 from confluent_kafka.serialization import StringDeserializer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
+import time
+
+MAX_RETRIES = 3
+
+def process_order(order):
+
+    product = order["product"]
+
+    # Simulated permanent failure
+    if product == "Item5":
+        raise ValueError("Permanent failure: invalid/unprocessable product")
+
+    print(
+        f"Order {order['orderId']} processed successfully."
+    )
+
+def process_with_retry(order):
+
+    for attempt in range(1, MAX_RETRIES + 1):
+
+        try:
+
+            # Simulate a temporary error for Item2
+            if order["product"] == "Item2" and attempt < 3:
+
+                raise ConnectionError(
+                    "Temporary service failure"
+                )
+
+            process_order(order)
+
+            return True
 
 
+        except ConnectionError as error:
+
+            print(
+                f"Temporary failure for Order "
+                f"{order['orderId']}"
+            )
+
+            print(
+                f"Retry attempt {attempt}/{MAX_RETRIES}"
+            )
+
+            print("Reason:", error)
+
+            time.sleep(1)
+
+
+        except ValueError:
+
+            # Permanent errors should not be retried
+            raise
+
+
+    return False
+    
 # -----------------------------
 # Schema Registry configuration
 # -----------------------------
