@@ -1,0 +1,19 @@
+Normal order → success
+       ↓
+Running average
+
+Item2
+       ↓
+Temporary failure
+       ↓
+Retry
+       ↓
+Success
+
+Item5
+       ↓
+Permanent failure
+       ↓
+orders-dlq
+       ↓
+DLQ consumer
