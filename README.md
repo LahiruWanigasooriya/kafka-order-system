@@ -191,15 +191,6 @@ curl.exe http://localhost:8081/subjects
 
 The output should include a subject such as `orders-value`; publishing to the DLQ may also register `orders-dlq-value`. The precise list depends on which topics have received messages.
 
-## Live demo (approximately 3–5 minutes)
-
-1. **Show infrastructure:** run `docker compose ps` and identify ZooKeeper, Kafka, and Schema Registry.
-2. **Show topics:** list the topics using the command above; explain `orders` and `orders-dlq`. Clarify that `orders-retry` is provisioned but local retries are used.
-3. **Show schema:** open `order.avsc` and explain `orderId`, `product`, and `price`.
-4. **Run all three scripts:** start the main consumer, then the DLQ consumer, then the producer. Point out normal processing and changes to the running average.
-5. **Show retries and DLQ:** wait for an `Item2` to fail twice and succeed, and for an `Item5` to appear in both the main consumer's DLQ log and the DLQ consumer's output. Because product selection is random, the timing of these examples varies.
-6. **Conclude:** summarize Avro serialization, Kafka messaging, successful-order aggregation, temporary-failure retries, and permanent-failure DLQ handling.
-
 ## Stop the system
 
 Stop each Python script with **Ctrl+C**, then stop the infrastructure:
@@ -209,11 +200,3 @@ docker compose down
 ```
 
 This removes the project's containers but normally keeps downloaded images. **Warning:** `docker compose down -v` additionally removes associated volumes and may delete stored Kafka data; use it only when you intentionally want to reset the environment.
-
-## Implementation scope
-
-This is a local demonstration of the assignment's core behaviors, not a production-grade exactly-once processing pipeline. Retries occur in the consumer process, aggregation is in memory, and simulated failures are selected by product name. For production use, consider durable aggregation state, explicit offset/acknowledgment handling, confirmed DLQ delivery, idempotent processing, and richer failure metadata.
-
-## Submission
-
-Push the project source files, schema, dependency list, Docker Compose configuration, and this README to a Git repository. Do not commit the local `venv/` directory, secrets, or generated caches. Verify that the setup instructions work from a clean checkout before submitting.
